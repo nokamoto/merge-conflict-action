@@ -1,15 +1,5 @@
 import * as github from "@actions/github";
-
-interface repo {
-  token: string;
-  owner: string;
-  repo: string;
-}
-
-interface pull {
-  number: number;
-  mergeable_state: string;
-}
+import { repo, pull } from "./github";
 
 export async function listPulls({ token, owner, repo }: repo): Promise<pull[]> {
   const octokit = github.getOctokit(token);
