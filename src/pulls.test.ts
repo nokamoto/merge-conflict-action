@@ -122,4 +122,28 @@ describe("listMergeConflictPulls", () => {
     expect(list).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(0);
   });
+
+  test("error if get failed", async () => {
+    const list = jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        data: [{ number: 1 }, { number: 2 }],
+      })
+    );
+
+    const get = jest.fn().mockImplementation(() => Promise.reject(new Error("failed")));
+
+    const [getOctokit] = setup(list, get);
+
+    await expect(
+      listMergeConflictPulls({
+        repo: "repo",
+        owner: "owner",
+        token: "token",
+      })
+    ).rejects.toThrow("failed");
+
+    expect(getOctokit).toHaveBeenCalledTimes(2);
+    expect(list).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenCalledTimes(1);
+  });
 });
