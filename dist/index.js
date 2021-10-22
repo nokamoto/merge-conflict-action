@@ -16,7 +16,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 function run() {
-    return __awaiter(this, void 0, void 0, function* () { });
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise(() => {
+            return;
+        });
+    });
 }
 run();
 
