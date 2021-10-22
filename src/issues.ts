@@ -24,9 +24,14 @@ async function createIssueComment(
 export async function createIssueComments(
   repo: repo,
   pulls: pull[],
-  body: string
+  body: string,
+  dryrun: boolean
 ): Promise<void> {
   for (let i = 0; i < pulls.length; i++) {
+    if (dryrun) {
+      console.log("[dryrun]", "createIssueComment =", JSON.stringify(pulls[i]));
+      continue;
+    }
     await createIssueComment(repo, pulls[i].number, body);
   }
 }

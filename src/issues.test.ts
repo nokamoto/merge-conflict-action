@@ -13,13 +13,13 @@ describe("createIssueComments", () => {
       };
     });
 
+    const log = jest.fn();
+
     jest.spyOn(github, "getOctokit").mockImplementation(getOctokit);
 
-    jest.spyOn(console, "log").mockImplementation(() => {
-      return;
-    });
+    jest.spyOn(console, "log").mockImplementation(log);
 
-    return [getOctokit];
+    return [getOctokit, log];
   };
 
   test("create comments", async () => {
@@ -33,7 +33,8 @@ describe("createIssueComments", () => {
         { number: 1, mergeable_state: "dirty" },
         { number: 2, mergeable_state: "dirty" },
       ],
-      "body"
+      "body",
+      false
     );
 
     expect(getOctokit).toHaveBeenCalledTimes(2);
@@ -68,11 +69,45 @@ describe("createIssueComments", () => {
           { number: 1, mergeable_state: "dirty" },
           { number: 2, mergeable_state: "dirty" },
         ],
-        "body"
+        "body",
+        false
       )
     ).rejects.toThrow("failed");
 
     expect(getOctokit).toHaveBeenCalledTimes(1);
     expect(createComment).toHaveBeenCalledTimes(1);
+  });
+
+  test("skip to create comments if dryrun is true", async () => {
+    const createComment = jest.fn();
+
+    const [getOctokit, log] = setup(createComment);
+
+    await createIssueComments(
+      { repo: "repo", owner: "owner", token: "token" },
+      [
+        { number: 1, mergeable_state: "dirty" },
+        { number: 2, mergeable_state: "dirty" },
+      ],
+      "body",
+      true
+    );
+
+    expect(getOctokit).toHaveBeenCalledTimes(0);
+    expect(createComment).toHaveBeenCalledTimes(0);
+
+    expect(log).toHaveBeenCalledTimes(2);
+    expect(log).toHaveBeenNthCalledWith(
+      1,
+      "[dryrun]",
+      expect.anything(),
+      expect.anything()
+    );
+    expect(log).toHaveBeenNthCalledWith(
+      2,
+      "[dryrun]",
+      expect.anything(),
+      expect.anything()
+    );
   });
 });
