@@ -130,7 +130,9 @@ describe("listMergeConflictPulls", () => {
       })
     );
 
-    const get = jest.fn().mockImplementation(() => Promise.reject(new Error("failed")));
+    const get = jest
+      .fn()
+      .mockImplementation(() => Promise.reject(new Error("failed")));
 
     const [getOctokit] = setup(list, get);
 
