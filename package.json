@@ -6,8 +6,10 @@
   "scripts": {
     "build": "tsc",
     "package": "ncc build",
+    "format": "prettier --write '**/*.ts'",
+    "lint": "eslint src/**/*.ts",
     "test": "echo",
-    "all": "npm run build && npm run package && npm run test "
+    "all": "npm run format && npm run lint && npm run build && npm run package && npm run test "
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,12 @@
   },
   "homepage": "https://github.com/nokamoto/merge-conflict-action#readme",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
     "@vercel/ncc": "^0.31.1",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "2.4.1",
     "typescript": "^4.4.4"
   }
 }

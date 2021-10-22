@@ -1,3 +1,7 @@
-async function run(): Promise<void> {}
-  
-run();  
+async function run(): Promise<void> {
+  return new Promise(() => {
+    return;
+  });
+}
+
+run();
