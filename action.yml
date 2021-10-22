@@ -1,0 +1,5 @@
+name: Notify Merge Conflict
+description: Github Action to notify merge conflict pulls 
+runs:
+  using: node12
+  main: dist/index.js
