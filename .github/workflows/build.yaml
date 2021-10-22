@@ -24,3 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        with:
+          owner: nokamoto
+          repo: merge-conflict-action
+          token: ${{ secrets.GITHUB_TOKEN }}
+          dryrun: true

@@ -1,5 +1,23 @@
 name: Notify Merge Conflict
-description: Github Action to notify merge conflict pulls 
+description: Github Action to notify merge conflict pulls
+inputs:
+  owner:
+    description: A string identifier of the owner to retrieve merge conflict pulls.
+    required: true
+  repo:
+    description: A string identifier of the repository to retrieve merge conflict pulls.
+    required: true
+  token:
+    description: A string token to authenticate to Github.
+    required: true
+  body:
+    description: A string body to create issue comments.
+    required: false
+    default: Merge Conflict found
+  dryrun:
+    description: A boolean to indicate whether the action creates actual issue comments.
+    required: false
+    default: "false"
 runs:
   using: node12
   main: dist/index.js

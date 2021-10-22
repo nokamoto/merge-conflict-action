@@ -1,7 +1,3 @@
-async function run(): Promise<void> {
-  return new Promise(() => {
-    return;
-  });
-}
+import { run } from "./run";
 
 run();
