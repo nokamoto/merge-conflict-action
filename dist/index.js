@@ -105,7 +105,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listMergeConflictPulls = exports.listPulls = void 0;
 const github = __importStar(__nccwpck_require__(5438));
-function listPulls({ token, owner, repo }) {
+function listPulls({ token, owner, repo, }) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = github.getOctokit(token);
         return octokit.rest.pulls
@@ -116,7 +116,7 @@ function listPulls({ token, owner, repo }) {
             .then((res) => {
             console.log(JSON.stringify(res));
             return res.data.map((p) => {
-                return { number: p.number, mergeable_state: "" };
+                return { number: p.number };
             });
         });
     });
