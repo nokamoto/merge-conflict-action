@@ -1,7 +1,11 @@
 import * as github from "@actions/github";
 import { repo, pull } from "./github";
 
-export async function listPulls({ token, owner, repo }: repo): Promise<pull[]> {
+export async function listPulls({
+  token,
+  owner,
+  repo,
+}: repo): Promise<Omit<pull, "mergeable_state">[]> {
   const octokit = github.getOctokit(token);
 
   return octokit.rest.pulls
@@ -12,7 +16,7 @@ export async function listPulls({ token, owner, repo }: repo): Promise<pull[]> {
     .then((res) => {
       console.log(JSON.stringify(res));
       return res.data.map((p) => {
-        return { number: p.number, mergeable_state: "" };
+        return { number: p.number };
       });
     });
 }
