@@ -29,28 +29,19 @@ describe("createIssueComments", () => {
 
     await createIssueComments(
       { repo: "repo", owner: "owner", token: "token" },
-      [
-        { number: 1, mergeable_state: "dirty" },
-        { number: 2, mergeable_state: "dirty" },
-      ],
+      [{ number: 1, mergeable_state: "dirty" }],
       "body",
       false
     );
 
-    expect(getOctokit).toHaveBeenCalledTimes(2);
+    expect(getOctokit).toHaveBeenCalledTimes(1);
     expect(getOctokit).toHaveBeenCalledWith("token");
 
-    expect(createComment).toHaveBeenCalledTimes(2);
+    expect(createComment).toHaveBeenCalledTimes(1);
     expect(createComment).toHaveBeenNthCalledWith(1, {
       repo: "repo",
       owner: "owner",
       issue_number: 1,
-      body: "body",
-    });
-    expect(createComment).toHaveBeenNthCalledWith(2, {
-      repo: "repo",
-      owner: "owner",
-      issue_number: 2,
       body: "body",
     });
   });
@@ -65,10 +56,7 @@ describe("createIssueComments", () => {
     await expect(
       createIssueComments(
         { repo: "repo", owner: "owner", token: "token" },
-        [
-          { number: 1, mergeable_state: "dirty" },
-          { number: 2, mergeable_state: "dirty" },
-        ],
+        [{ number: 1, mergeable_state: "dirty" }],
         "body",
         false
       )
@@ -85,10 +73,7 @@ describe("createIssueComments", () => {
 
     await createIssueComments(
       { repo: "repo", owner: "owner", token: "token" },
-      [
-        { number: 1, mergeable_state: "dirty" },
-        { number: 2, mergeable_state: "dirty" },
-      ],
+      [{ number: 1, mergeable_state: "dirty" }],
       "body",
       true
     );
@@ -96,15 +81,7 @@ describe("createIssueComments", () => {
     expect(getOctokit).toHaveBeenCalledTimes(0);
     expect(createComment).toHaveBeenCalledTimes(0);
 
-    expect(log).toHaveBeenCalledTimes(2);
-    expect(log).toHaveBeenNthCalledWith(
-      1,
-      "[dryrun]",
-      expect.anything(),
-      expect.anything()
-    );
-    expect(log).toHaveBeenNthCalledWith(
-      2,
+    expect(log).toHaveBeenCalledWith(
       "[dryrun]",
       expect.anything(),
       expect.anything()
