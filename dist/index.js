@@ -132,10 +132,12 @@ function getPull({ token, owner, repo }, number) {
             pull_number: number,
         })
             .then((res) => {
+            var _a;
             console.log(JSON.stringify(res));
             return {
                 number: res.data.number,
                 mergeable_state: res.data.mergeable_state,
+                pushed_at: (_a = res.data.head.repo) === null || _a === void 0 ? void 0 : _a.pushed_at,
             };
         });
     });
@@ -149,10 +151,7 @@ function listMergeConflictPulls(repo) {
             console.log(JSON.stringify(p));
             switch (p.mergeable_state) {
                 case "dirty":
-                    conflictingPulls.push({
-                        number: p.number,
-                        mergeable_state: p.mergeable_state,
-                    });
+                    conflictingPulls.push(p);
                     break;
             }
         }
