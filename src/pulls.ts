@@ -5,7 +5,7 @@ export async function listPulls({
   token,
   owner,
   repo,
-}: repo): Promise<Omit<pull, "mergeable_state">[]> {
+}: repo): Promise<Omit<pull, "mergeable_state" | "pushed_at">[]> {
   const octokit = github.getOctokit(token);
 
   return octokit.rest.pulls
@@ -38,6 +38,7 @@ async function getPull(
       return {
         number: res.data.number,
         mergeable_state: res.data.mergeable_state,
+        pushed_at: res.data.head.repo?.pushed_at,
       };
     });
 }
@@ -53,10 +54,7 @@ export async function listMergeConflictPulls(repo: repo): Promise<pull[]> {
 
     switch (p.mergeable_state) {
       case "dirty":
-        conflictingPulls.push({
-          number: p.number,
-          mergeable_state: p.mergeable_state,
-        });
+        conflictingPulls.push(p);
         break;
     }
   }

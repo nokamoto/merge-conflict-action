@@ -63,10 +63,18 @@ describe("listMergeConflictPulls", () => {
     const get = jest
       .fn()
       .mockImplementationOnce(() =>
-        Promise.resolve({ data: { number: 1, mergeable_state: "dirty" } })
+        Promise.resolve({
+          data: {
+            number: 1,
+            mergeable_state: "dirty",
+            head: { repo: { pushed_at: "2011-01-26T19:06:43Z" } },
+          },
+        })
       )
       .mockImplementationOnce(() =>
-        Promise.resolve({ data: { number: 2, mergeable_state: "clean" } })
+        Promise.resolve({
+          data: { number: 2, mergeable_state: "clean", head: {} },
+        })
       );
 
     const [getOctokit] = setup(list, get);
@@ -98,7 +106,13 @@ describe("listMergeConflictPulls", () => {
       pull_number: 2,
     });
 
-    expect(actual).toEqual([{ number: 1, mergeable_state: "dirty" }]);
+    expect(actual).toEqual([
+      {
+        number: 1,
+        mergeable_state: "dirty",
+        pushed_at: "2011-01-26T19:06:43Z",
+      },
+    ]);
   });
 
   test("error if list failed", async () => {

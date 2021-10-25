@@ -7,4 +7,5 @@ export interface repo {
 export interface pull {
   number: number;
   mergeable_state: string;
+  pushed_at?: string;
 }
