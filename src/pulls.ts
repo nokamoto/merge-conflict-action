@@ -1,5 +1,5 @@
 import * as github from "@actions/github";
-import { repo, pull } from "./github";
+import { repo, pull, pretty } from "./github";
 
 export async function listPulls({
   token,
@@ -14,7 +14,7 @@ export async function listPulls({
       repo: repo,
     })
     .then((res) => {
-      console.log(JSON.stringify(res));
+      console.log(pretty(res));
       return res.data.map((p) => {
         return { number: p.number };
       });
@@ -34,7 +34,7 @@ async function getPull(
       pull_number: number,
     })
     .then((res) => {
-      console.log(JSON.stringify(res));
+      console.log(pretty(res));
       return {
         number: res.data.number,
         mergeable_state: res.data.mergeable_state,
