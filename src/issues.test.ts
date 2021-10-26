@@ -153,7 +153,7 @@ describe("filterPulls", () => {
   test("filter pulls if created_at > pushed_at", async () => {
     const listComments = jest.fn().mockImplementation(() =>
       Promise.resolve({
-        data: [{ body_text: "body", created_at: "2011-01-27T19:06:43Z" }],
+        data: [{ body: "body", created_at: "2011-01-27T19:06:43Z" }],
       })
     );
 
@@ -180,7 +180,7 @@ describe("filterPulls", () => {
   test("do not filter pulls if created_at < pushed_at", async () => {
     const listComments = jest.fn().mockImplementation(() =>
       Promise.resolve({
-        data: [{ body_text: "body", created_at: "2011-01-25T19:06:43Z" }],
+        data: [{ body: "body", created_at: "2011-01-25T19:06:43Z" }],
       })
     );
 
@@ -213,7 +213,7 @@ describe("filterPulls", () => {
   test("do not filter pulls if created_at > pushed_at but body != body_text", async () => {
     const listComments = jest.fn().mockImplementation(() =>
       Promise.resolve({
-        data: [{ body_text: "!= body", created_at: "2011-01-27T19:06:43Z" }],
+        data: [{ body: "!= body", created_at: "2011-01-27T19:06:43Z" }],
       })
     );
 

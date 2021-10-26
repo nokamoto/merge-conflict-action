@@ -66,7 +66,7 @@ function listIssueComments({ token, owner, repo }, issue_number) {
             console.log(JSON.stringify(res));
             return res.data.map((c) => {
                 return {
-                    body_text: c.body_text,
+                    body: c.body,
                     created_at: c.created_at,
                 };
             });
@@ -85,7 +85,7 @@ function filterPulls(repo, pulls, body) {
             const pushed_at = p.pushed_at;
             const comments = yield listIssueComments(repo, p.number);
             const forward = (c) => {
-                if (c.body_text != body) {
+                if (c.body != body) {
                     return false;
                 }
                 const commentts = Date.parse(c.created_at);
@@ -263,7 +263,8 @@ function run() {
             console.log("repo =", JSON.stringify(repo), ", body =", body, ", dryrun =", dryrun);
             const pulls = yield (0, pulls_1.listMergeConflictPulls)(repo);
             console.log("pulls =", pulls);
-            yield (0, issues_1.createIssueComments)(repo, pulls, body, dryrun);
+            const filtered = yield (0, issues_1.filterPulls)(repo, pulls, body);
+            yield (0, issues_1.createIssueComments)(repo, filtered, body, dryrun);
             console.log("done");
         }
         catch (error) {
