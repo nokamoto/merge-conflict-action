@@ -11,5 +11,9 @@ export interface pull {
 }
 
 export function pretty(res: { status: number; url: string }): string {
-  return JSON.stringify(res);
+  try {
+    return JSON.stringify({ status: res.status, url: res.url });
+  } catch (e) {
+    return "";
+  }
 }

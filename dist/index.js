@@ -9,7 +9,12 @@
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.pretty = void 0;
 function pretty(res) {
-    return JSON.stringify(res);
+    try {
+        return JSON.stringify({ status: res.status, url: res.url });
+    }
+    catch (e) {
+        return "";
+    }
 }
 exports.pretty = pretty;
 
