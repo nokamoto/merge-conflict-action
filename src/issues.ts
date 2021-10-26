@@ -1,5 +1,5 @@
 import * as github from "@actions/github";
-import { repo, pull } from "./github";
+import { repo, pull, pretty } from "./github";
 
 interface comment {
   body?: string;
@@ -21,7 +21,7 @@ async function createIssueComment(
       body: body,
     })
     .then((res) => {
-      console.log(JSON.stringify(res));
+      console.log(pretty(res));
       return;
     });
 }
@@ -39,7 +39,7 @@ async function listIssueComments(
       issue_number: issue_number,
     })
     .then((res) => {
-      console.log(JSON.stringify(res));
+      console.log(pretty(res));
       return res.data.map((c) => {
         return {
           body: c.body,

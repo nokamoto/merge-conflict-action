@@ -9,3 +9,7 @@ export interface pull {
   mergeable_state: string;
   pushed_at?: string;
 }
+
+export function pretty(res: { status: number; url: string }): string {
+  return JSON.stringify(res);
+}

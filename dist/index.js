@@ -1,6 +1,21 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 5928:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.pretty = void 0;
+function pretty(res) {
+    return JSON.stringify(res);
+}
+exports.pretty = pretty;
+
+
+/***/ }),
+
 /***/ 6962:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -37,6 +52,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createIssueComments = exports.filterPulls = void 0;
 const github = __importStar(__nccwpck_require__(5438));
+const github_1 = __nccwpck_require__(5928);
 function createIssueComment({ token, owner, repo }, issue_number, body) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = github.getOctokit(token);
@@ -48,7 +64,7 @@ function createIssueComment({ token, owner, repo }, issue_number, body) {
             body: body,
         })
             .then((res) => {
-            console.log(JSON.stringify(res));
+            console.log((0, github_1.pretty)(res));
             return;
         });
     });
@@ -63,7 +79,7 @@ function listIssueComments({ token, owner, repo }, issue_number) {
             issue_number: issue_number,
         })
             .then((res) => {
-            console.log(JSON.stringify(res));
+            console.log((0, github_1.pretty)(res));
             return res.data.map((c) => {
                 return {
                     body: c.body,
@@ -154,6 +170,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listMergeConflictPulls = exports.listPulls = void 0;
 const github = __importStar(__nccwpck_require__(5438));
+const github_1 = __nccwpck_require__(5928);
 function listPulls({ token, owner, repo, }) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = github.getOctokit(token);
@@ -163,7 +180,7 @@ function listPulls({ token, owner, repo, }) {
             repo: repo,
         })
             .then((res) => {
-            console.log(JSON.stringify(res));
+            console.log((0, github_1.pretty)(res));
             return res.data.map((p) => {
                 return { number: p.number };
             });
@@ -182,7 +199,7 @@ function getPull({ token, owner, repo }, number) {
         })
             .then((res) => {
             var _a;
-            console.log(JSON.stringify(res));
+            console.log((0, github_1.pretty)(res));
             return {
                 number: res.data.number,
                 mergeable_state: res.data.mergeable_state,
