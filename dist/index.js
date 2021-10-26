@@ -35,7 +35,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueComments = void 0;
+exports.createIssueComments = exports.filterPulls = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 function createIssueComment({ token, owner, repo }, issue_number, body) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -53,6 +53,55 @@ function createIssueComment({ token, owner, repo }, issue_number, body) {
         });
     });
 }
+function listIssueComments({ token, owner, repo }, issue_number) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(token);
+        return octokit.rest.issues
+            .listComments({
+            owner: owner,
+            repo: repo,
+            issue_number: issue_number,
+        })
+            .then((res) => {
+            console.log(JSON.stringify(res));
+            return res.data.map((c) => {
+                return {
+                    body_text: c.body_text,
+                    created_at: c.created_at,
+                };
+            });
+        });
+    });
+}
+function filterPulls(repo, pulls, body) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const filtered = [];
+        for (let i = 0; i < pulls.length; i++) {
+            const p = pulls[i];
+            if (!p.pushed_at) {
+                console.log("[pushed_at undefined]", JSON.stringify(p));
+                continue;
+            }
+            const pushed_at = p.pushed_at;
+            const comments = yield listIssueComments(repo, p.number);
+            const forward = (c) => {
+                if (c.body_text != body) {
+                    return false;
+                }
+                const commentts = Date.parse(c.created_at);
+                const pullts = Date.parse(pushed_at);
+                return commentts >= pullts;
+            };
+            if (comments.some(forward)) {
+                console.log("[already notified]", JSON.stringify(p), JSON.stringify(comments));
+                continue;
+            }
+            filtered.push(p);
+        }
+        return filtered;
+    });
+}
+exports.filterPulls = filterPulls;
 function createIssueComments(repo, pulls, body, dryrun) {
     return __awaiter(this, void 0, void 0, function* () {
         for (let i = 0; i < pulls.length; i++) {

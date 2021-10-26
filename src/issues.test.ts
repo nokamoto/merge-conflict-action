@@ -1,5 +1,5 @@
 import * as github from "@actions/github";
-import { createIssueComments } from "./issues";
+import { createIssueComments, filterPulls } from "./issues";
 
 describe("createIssueComments", () => {
   const setup = (createComment: jest.Mock) => {
@@ -86,5 +86,160 @@ describe("createIssueComments", () => {
       expect.anything(),
       expect.anything()
     );
+  });
+});
+
+describe("filterPulls", () => {
+  const setup = (listComments: jest.Mock) => {
+    const getOctokit = jest.fn().mockImplementation(() => {
+      const { GitHub } = jest.requireActual("@actions/github/lib/utils");
+      return {
+        ...GitHub,
+        rest: {
+          issues: { listComments: listComments },
+        },
+      };
+    });
+
+    const log = jest.fn();
+
+    jest.spyOn(github, "getOctokit").mockImplementation(getOctokit);
+
+    jest.spyOn(console, "log").mockImplementation(log);
+
+    return [getOctokit, log];
+  };
+
+  test("do not filter pulls if no issue comments", async () => {
+    const listComments = jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        data: [],
+      })
+    );
+
+    const [getOctokit] = setup(listComments);
+
+    const actual = await filterPulls(
+      { owner: "owner", repo: "repo", token: "token" },
+      [
+        {
+          number: 1,
+          mergeable_state: "dirty",
+          pushed_at: "2011-01-26T19:06:43Z",
+        },
+      ],
+      "body"
+    );
+
+    expect(actual).toEqual([
+      {
+        number: 1,
+        mergeable_state: "dirty",
+        pushed_at: "2011-01-26T19:06:43Z",
+      },
+    ]);
+
+    expect(getOctokit).toHaveBeenCalledTimes(1);
+    expect(getOctokit).toHaveBeenCalledWith("token");
+
+    expect(listComments).toHaveBeenCalledTimes(1);
+    expect(listComments).toHaveBeenCalledWith({
+      owner: "owner",
+      repo: "repo",
+      issue_number: 1,
+    });
+  });
+
+  test("filter pulls if created_at > pushed_at", async () => {
+    const listComments = jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        data: [{ body_text: "body", created_at: "2011-01-27T19:06:43Z" }],
+      })
+    );
+
+    const [getOctokit] = setup(listComments);
+
+    const actual = await filterPulls(
+      { owner: "owner", repo: "repo", token: "token" },
+      [
+        {
+          number: 1,
+          mergeable_state: "dirty",
+          pushed_at: "2011-01-26T19:06:43Z",
+        },
+      ],
+      "body"
+    );
+
+    expect(actual).toEqual([]);
+
+    expect(getOctokit).toHaveBeenCalledTimes(1);
+    expect(listComments).toHaveBeenCalledTimes(1);
+  });
+
+  test("do not filter pulls if created_at < pushed_at", async () => {
+    const listComments = jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        data: [{ body_text: "body", created_at: "2011-01-25T19:06:43Z" }],
+      })
+    );
+
+    const [getOctokit] = setup(listComments);
+
+    const actual = await filterPulls(
+      { owner: "owner", repo: "repo", token: "token" },
+      [
+        {
+          number: 1,
+          mergeable_state: "dirty",
+          pushed_at: "2011-01-26T19:06:43Z",
+        },
+      ],
+      "body"
+    );
+
+    expect(actual).toEqual([
+      {
+        number: 1,
+        mergeable_state: "dirty",
+        pushed_at: "2011-01-26T19:06:43Z",
+      },
+    ]);
+
+    expect(getOctokit).toHaveBeenCalledTimes(1);
+    expect(listComments).toHaveBeenCalledTimes(1);
+  });
+
+  test("do not filter pulls if created_at > pushed_at but body != body_text", async () => {
+    const listComments = jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        data: [{ body_text: "!= body", created_at: "2011-01-27T19:06:43Z" }],
+      })
+    );
+
+    const [getOctokit] = setup(listComments);
+
+    const actual = await filterPulls(
+      { owner: "owner", repo: "repo", token: "token" },
+      [
+        {
+          number: 1,
+          mergeable_state: "dirty",
+          pushed_at: "2011-01-26T19:06:43Z",
+        },
+      ],
+      "body"
+    );
+
+    expect(actual).toEqual([
+      {
+        number: 1,
+        mergeable_state: "dirty",
+        pushed_at: "2011-01-26T19:06:43Z",
+      },
+    ]);
+
+    expect(getOctokit).toHaveBeenCalledTimes(1);
+    expect(listComments).toHaveBeenCalledTimes(1);
   });
 });
