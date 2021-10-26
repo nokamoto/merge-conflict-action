@@ -66,7 +66,7 @@ function listIssueComments({ token, owner, repo }, issue_number) {
             console.log(JSON.stringify(res));
             return res.data.map((c) => {
                 return {
-                    body_text: c.body_text,
+                    body: c.body,
                     created_at: c.created_at,
                 };
             });
@@ -85,7 +85,7 @@ function filterPulls(repo, pulls, body) {
             const pushed_at = p.pushed_at;
             const comments = yield listIssueComments(repo, p.number);
             const forward = (c) => {
-                if (c.body_text != body) {
+                if (c.body != body) {
                     return false;
                 }
                 const commentts = Date.parse(c.created_at);

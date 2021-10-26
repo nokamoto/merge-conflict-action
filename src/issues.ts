@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import { repo, pull } from "./github";
 
 interface comment {
-  body_text?: string;
+  body?: string;
   created_at: string;
 }
 
@@ -42,7 +42,7 @@ async function listIssueComments(
       console.log(JSON.stringify(res));
       return res.data.map((c) => {
         return {
-          body_text: c.body_text,
+          body: c.body,
           created_at: c.created_at,
         };
       });
@@ -65,7 +65,7 @@ export async function filterPulls(
 
     const comments = await listIssueComments(repo, p.number);
     const forward: (c: comment) => boolean = (c) => {
-      if (c.body_text != body) {
+      if (c.body != body) {
         return false;
       }
       const commentts = Date.parse(c.created_at);
