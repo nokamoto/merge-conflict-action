@@ -263,7 +263,8 @@ function run() {
             console.log("repo =", JSON.stringify(repo), ", body =", body, ", dryrun =", dryrun);
             const pulls = yield (0, pulls_1.listMergeConflictPulls)(repo);
             console.log("pulls =", pulls);
-            yield (0, issues_1.createIssueComments)(repo, pulls, body, dryrun);
+            const filtered = yield (0, issues_1.filterPulls)(repo, pulls, body);
+            yield (0, issues_1.createIssueComments)(repo, filtered, body, dryrun);
             console.log("done");
         }
         catch (error) {

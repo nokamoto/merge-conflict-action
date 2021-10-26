@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { createIssueComments } from "./issues";
+import { createIssueComments, filterPulls } from "./issues";
 import { listMergeConflictPulls } from "./pulls";
 
 export async function run(): Promise<void> {
@@ -25,7 +25,9 @@ export async function run(): Promise<void> {
 
     console.log("pulls =", pulls);
 
-    await createIssueComments(repo, pulls, body, dryrun);
+    const filtered = await filterPulls(repo, pulls, body);
+
+    await createIssueComments(repo, filtered, body, dryrun);
 
     console.log("done");
   } catch (error) {
