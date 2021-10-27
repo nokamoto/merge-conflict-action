@@ -53,3 +53,7 @@ npm run build-assets
 ```
 
 Build `docs/assets/svg/*.svg`.
+
+### Release
+
+Manual. Use the Github release web interface with auto-generate release notes.
