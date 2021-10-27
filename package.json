@@ -10,7 +10,7 @@
     "lint": "eslint src/**/*.ts",
     "test": "jest",
     "mermaid": "mmdc",
-    "build-assets": "npm run mermaid -- -i docs/assets/mmd/flow.mmd -o docs/assets/svg/flow.svg",
+    "build-assets": "npm run mermaid -- -i docs/assets/mmd/flow.mmd -o docs/assets/png/flow.png",
     "all": "npm run format && npm run lint && npm run build && npm run package && npm run test "
   },
   "repository": {

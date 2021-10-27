@@ -31,7 +31,7 @@ jobs:
 | dryrun | A boolean to indicate whether the action creates actual issue comments. | false | `"false"` |
 
 ## How does it works?
-![flow.svg](docs/assets/svg/flow.svg)
+![flow.png](docs/assets/png/flow.png)
 
 - [pulls.list](https://docs.github.com/en/rest/reference/pulls#list-pull-requests)
 - [pulls.get](https://docs.github.com/en/rest/reference/pulls#get-a-pull-request)
