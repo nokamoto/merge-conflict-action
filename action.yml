@@ -1,5 +1,8 @@
 name: Notify Merge Conflict
 description: Github Action to notify merge conflict pulls
+branding:
+  icon: alert-octagon
+  color: gray-dark
 inputs:
   owner:
     description: A string identifier of the owner to retrieve merge conflict pulls.
