@@ -9,6 +9,8 @@
     "format": "prettier --write '**/*.ts'",
     "lint": "eslint src/**/*.ts",
     "test": "jest",
+    "mermaid": "mmdc",
+    "build-assets": "npm run mermaid -- -i docs/assets/mmd/flow.mmd -o docs/assets/png/flow.png",
     "all": "npm run format && npm run lint && npm run build && npm run package && npm run test "
   },
   "repository": {
@@ -22,6 +24,7 @@
   },
   "homepage": "https://github.com/nokamoto/merge-conflict-action#readme",
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^8.13.3",
     "@types/jest": "^27.0.2",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
