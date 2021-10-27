@@ -1,6 +1,6 @@
 {
   "name": "merge-conflict-action",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Github action to notify merge conflict pulls",
   "main": "lib/main.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "test": "jest",
     "mermaid": "mmdc",
     "build-assets": "npm run mermaid -- -i docs/assets/mmd/flow.mmd -o docs/assets/png/flow.png",
-    "all": "npm run format && npm run lint && npm run build && npm run package && npm run test "
+    "release-ref": "sed -i \"s/nokamoto\\/merge-conflict-action@v.*/nokamoto\\/merge-conflict-action@v$(cat package.json | jq -r .version)/g\" README.md",
+    "all": "npm run format && npm run lint && npm run build && npm run package && npm run test && npm run release-ref"
   },
   "repository": {
     "type": "git",
