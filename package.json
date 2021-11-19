@@ -26,7 +26,7 @@
   "homepage": "https://github.com/nokamoto/merge-conflict-action#readme",
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^8.13.3",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vercel/ncc": "^0.32.0",
