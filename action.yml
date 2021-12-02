@@ -21,6 +21,10 @@ inputs:
     description: A boolean to indicate whether the action creates actual issue comments.
     required: false
     default: "false"
+  unknown-state-max-retries:
+    description: A number of maximum retries to get a pull state. The `pulls.get` request retries when the response state is `unknown`.
+    required: false
+    default: "5"
 runs:
   using: node12
   main: dist/index.js

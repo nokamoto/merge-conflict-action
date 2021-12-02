@@ -6,10 +6,17 @@ import * as issues from "./issues";
 describe("run", () => {
   const dryrun = false;
 
+  const unknownStateMaxRetries = 0;
+
   const setup = (list: jest.Mock, filter: jest.Mock, create: jest.Mock) => {
     const setFailed = jest.fn();
     const log = jest.fn();
-    jest.spyOn(core, "getInput").mockImplementation((name) => name);
+    jest.spyOn(core, "getInput").mockImplementation((name) => {
+      if (name == "unknown-state-max-retries") {
+        return unknownStateMaxRetries.toString();
+      }
+      return name;
+    });
     jest.spyOn(core, "getBooleanInput").mockImplementation(() => dryrun);
     jest.spyOn(core, "setFailed").mockImplementation(setFailed);
     jest.spyOn(pulls, "listMergeConflictPulls").mockImplementation(list);
@@ -40,11 +47,15 @@ describe("run", () => {
     expect(log).toHaveBeenLastCalledWith("done");
 
     expect(list).toHaveBeenCalledTimes(1);
-    expect(list).toHaveBeenCalledWith({
-      owner: "owner",
-      repo: "repo",
-      token: "token",
-    });
+    expect(list).toHaveBeenCalledWith(
+      {
+        owner: "owner",
+        repo: "repo",
+        token: "token",
+      },
+      unknownStateMaxRetries,
+      expect.anything()
+    );
 
     expect(filter).toHaveBeenCalledTimes(1);
     expect(filter).toHaveBeenCalledWith(
