@@ -43,20 +43,44 @@ async function getPull(
     });
 }
 
-export async function listMergeConflictPulls(repo: repo): Promise<pull[]> {
+export async function exponentialBackoff(retries: number): Promise<void> {
+  return new Promise((resolve) =>
+    setTimeout(resolve, Math.min(10, 1 * 2 ** retries) * 1000)
+  );
+}
+
+export async function listMergeConflictPulls(
+  repo: repo,
+  unknownStateMaxRetries: number,
+  sleep: (retries: number) => Promise<void>
+): Promise<pull[]> {
   const pulls = await listPulls(repo);
 
   const conflictingPulls: pull[] = [];
   for (let i = 0; i < pulls.length; i++) {
-    const p = await getPull(repo, pulls[i].number);
+    const expbackoff = async (retries: number) => {
+      if (retries > unknownStateMaxRetries) {
+        console.log("exceed max trial");
+        return;
+      }
+      if (retries != 0) {
+        await sleep(retries);
+      }
 
-    console.log(JSON.stringify(p));
+      const p = await getPull(repo, pulls[i].number);
+      console.log(JSON.stringify(p));
+      switch (p.mergeable_state) {
+        case "dirty":
+          conflictingPulls.push(p);
+          break;
 
-    switch (p.mergeable_state) {
-      case "dirty":
-        conflictingPulls.push(p);
-        break;
-    }
+        case "unknown":
+          expbackoff(retries + 1);
+          break;
+      }
+    };
+
+    await expbackoff(0);
   }
 
   return conflictingPulls;

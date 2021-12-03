@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { createIssueComments, filterPulls } from "./issues";
-import { listMergeConflictPulls } from "./pulls";
+import { exponentialBackoff, listMergeConflictPulls } from "./pulls";
 
 export async function run(): Promise<void> {
   try {
@@ -11,6 +11,7 @@ export async function run(): Promise<void> {
     };
     const body = core.getInput("body");
     const dryrun = core.getBooleanInput("dryrun");
+    const unknownStateMaxRetries = core.getInput("unknown-state-max-retries");
 
     console.log(
       "repo =",
@@ -18,10 +19,16 @@ export async function run(): Promise<void> {
       ", body =",
       body,
       ", dryrun =",
-      dryrun
+      dryrun,
+      ", unknown-state-max-retries =",
+      unknownStateMaxRetries
     );
 
-    const pulls = await listMergeConflictPulls(repo);
+    const pulls = await listMergeConflictPulls(
+      repo,
+      parseInt(unknownStateMaxRetries, 10),
+      exponentialBackoff
+    );
 
     console.log("pulls =", pulls);
 

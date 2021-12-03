@@ -173,7 +173,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.listMergeConflictPulls = exports.listPulls = void 0;
+exports.listMergeConflictPulls = exports.exponentialBackoff = exports.listPulls = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const github_1 = __nccwpck_require__(5928);
 function listPulls({ token, owner, repo, }) {
@@ -213,18 +213,37 @@ function getPull({ token, owner, repo }, number) {
         });
     });
 }
-function listMergeConflictPulls(repo) {
+function exponentialBackoff(retries) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve) => setTimeout(resolve, Math.min(10, 1 * Math.pow(2, retries)) * 1000));
+    });
+}
+exports.exponentialBackoff = exponentialBackoff;
+function listMergeConflictPulls(repo, unknownStateMaxRetries, sleep) {
     return __awaiter(this, void 0, void 0, function* () {
         const pulls = yield listPulls(repo);
         const conflictingPulls = [];
         for (let i = 0; i < pulls.length; i++) {
-            const p = yield getPull(repo, pulls[i].number);
-            console.log(JSON.stringify(p));
-            switch (p.mergeable_state) {
-                case "dirty":
-                    conflictingPulls.push(p);
-                    break;
-            }
+            const expbackoff = (retries) => __awaiter(this, void 0, void 0, function* () {
+                if (retries > unknownStateMaxRetries) {
+                    console.log("exceed max trial");
+                    return;
+                }
+                if (retries != 0) {
+                    yield sleep(retries);
+                }
+                const p = yield getPull(repo, pulls[i].number);
+                console.log(JSON.stringify(p));
+                switch (p.mergeable_state) {
+                    case "dirty":
+                        conflictingPulls.push(p);
+                        break;
+                    case "unknown":
+                        expbackoff(retries + 1);
+                        break;
+                }
+            });
+            yield expbackoff(0);
         }
         return conflictingPulls;
     });
@@ -282,8 +301,9 @@ function run() {
             };
             const body = core.getInput("body");
             const dryrun = core.getBooleanInput("dryrun");
-            console.log("repo =", JSON.stringify(repo), ", body =", body, ", dryrun =", dryrun);
-            const pulls = yield (0, pulls_1.listMergeConflictPulls)(repo);
+            const unknownStateMaxRetries = core.getInput("unknown-state-max-retries");
+            console.log("repo =", JSON.stringify(repo), ", body =", body, ", dryrun =", dryrun, ", unknown-state-max-retries =", unknownStateMaxRetries);
+            const pulls = yield (0, pulls_1.listMergeConflictPulls)(repo, parseInt(unknownStateMaxRetries, 10), pulls_1.exponentialBackoff);
             console.log("pulls =", pulls);
             const filtered = yield (0, issues_1.filterPulls)(repo, pulls, body);
             yield (0, issues_1.createIssueComments)(repo, filtered, body, dryrun);
