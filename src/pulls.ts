@@ -44,7 +44,9 @@ async function getPull(
 }
 
 export async function exponentialBackoff(retries: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, Math.min(10, 1 * 2 ** retries) * 1000));
+  return new Promise((resolve) =>
+    setTimeout(resolve, Math.min(10, 1 * 2 ** retries) * 1000)
+  );
 }
 
 export async function listMergeConflictPulls(

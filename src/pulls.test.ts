@@ -1,4 +1,4 @@
-import { listMergeConflictPulls } from "./pulls";
+import { exponentialBackoff, listMergeConflictPulls } from "./pulls";
 import * as github from "@actions/github";
 
 describe("listMergeConflictPulls", () => {
@@ -48,7 +48,7 @@ describe("listMergeConflictPulls", () => {
     expect(getOctokit).toHaveBeenCalledTimes(1);
     expect(getOctokit).toHaveBeenCalledWith("token");
 
-    expect(sleep).toBeCalledTimes(0);
+    expect(sleep).toHaveBeenCalledTimes(0);
 
     expect(list).toHaveBeenCalledTimes(1);
     expect(list).toHaveBeenCalledWith({
@@ -100,7 +100,7 @@ describe("listMergeConflictPulls", () => {
     expect(getOctokit).toHaveBeenCalledTimes(3);
     expect(getOctokit).toHaveBeenCalledWith("token");
 
-    expect(sleep).toBeCalledTimes(0);
+    expect(sleep).toHaveBeenCalledTimes(0);
 
     expect(list).toHaveBeenCalledTimes(1);
     expect(list).toHaveBeenCalledWith({
@@ -161,7 +161,7 @@ describe("listMergeConflictPulls", () => {
     expect(getOctokit).toHaveBeenCalledTimes(3);
     expect(list).toHaveBeenCalledTimes(1);
 
-    expect(sleep).toBeCalledTimes(1);
+    expect(sleep).toHaveBeenCalledTimes(1);
 
     expect(get).toHaveBeenCalledTimes(2);
     expect(get).toHaveBeenNthCalledWith(1, {
@@ -200,7 +200,7 @@ describe("listMergeConflictPulls", () => {
     ).rejects.toThrow("failed");
 
     expect(getOctokit).toHaveBeenCalledTimes(1);
-    expect(sleep).toBeCalledTimes(0);
+    expect(sleep).toHaveBeenCalledTimes(0);
     expect(list).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(0);
   });
@@ -231,8 +231,29 @@ describe("listMergeConflictPulls", () => {
     ).rejects.toThrow("failed");
 
     expect(getOctokit).toHaveBeenCalledTimes(2);
-    expect(sleep).toBeCalledTimes(0);
+    expect(sleep).toHaveBeenCalledTimes(0);
     expect(list).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("exponentialBackoff", () => {
+  test("call setTimeout with exponential backoff", async () => {
+    jest.useFakeTimers();
+    jest.spyOn(global, "setTimeout");
+
+    const run = async (trial: number, expected: number) => {
+      const p = exponentialBackoff(trial);
+      jest.runAllTimers();
+      await p;
+      expect(setTimeout).toHaveBeenLastCalledWith(expect.anything(), expected);
+    };
+
+    await run(0, 1000);
+    await run(1, 2000);
+    await run(2, 4000);
+    await run(3, 8000);
+    await run(4, 10000);
+    await run(5, 10000);
   });
 });

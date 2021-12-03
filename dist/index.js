@@ -215,7 +215,7 @@ function getPull({ token, owner, repo }, number) {
 }
 function exponentialBackoff(retries) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve) => setTimeout(resolve, Math.pow(retries, 2) * 1000));
+        return new Promise((resolve) => setTimeout(resolve, Math.min(10, 1 * Math.pow(2, retries)) * 1000));
     });
 }
 exports.exponentialBackoff = exponentialBackoff;
