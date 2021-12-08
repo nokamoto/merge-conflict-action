@@ -1,6 +1,6 @@
 {
   "name": "merge-conflict-action",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Github action to notify merge conflict pulls",
   "main": "lib/main.js",
   "scripts": {

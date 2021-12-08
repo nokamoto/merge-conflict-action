@@ -11,8 +11,11 @@ sequenceDiagram
     github ->> action : pulls (number)
 
     loop for each pulls
-        action ->> github : pulls.get
-        github ->> action : pull (mergeable_state, pushed_at)
+        loop do while mergeable_state == "unknown"
+            action ->> action : exponential backoff
+            action ->> github : pulls.get
+            github ->> action : pull (mergeable_state, pushed_at)
+        end
         alt mergeable_state != "dirty"
             action ->> action : drop
         end

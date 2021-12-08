@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: nokamoto/merge-conflict-action@v0.0.1
+      - uses: nokamoto/merge-conflict-action@v0.0.2
         with:
           owner: nokamoto
           repo: merge-conflict-action
