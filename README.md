@@ -31,7 +31,45 @@ jobs:
 | dryrun | A boolean to indicate whether the action creates actual issue comments. | false | `"false"` |
 
 ## How does it works?
-![flow.png](docs/assets/png/flow.png)
+```mermaid
+sequenceDiagram
+    autonumber
+
+    actor dev as Developer
+    participant github as Github
+    participant action as merge-conflict-action
+
+    dev ->> github : Merge pull
+    github ->> action : on.push.branches.main (body, dryrun)
+    action ->> github : pulls.list (state = open, sort = created, direction = desc, per_page = 30)
+    github ->> action : pulls (number)
+
+    loop for each pulls
+        loop do while mergeable_state == "unknown"
+            action ->> action : exponential backoff
+            action ->> github : pulls.get
+            github ->> action : pull (mergeable_state, pushed_at)
+        end
+        alt mergeable_state != "dirty"
+            action ->> action : drop
+        end
+    end
+
+    loop for each pulls
+        action ->> github : issues.listComments
+        github ->> action : comments (body', created_at)
+        alt exists body == body' and created_at > pushed_at
+            action ->> action : drop
+        end
+    end
+
+    loop for each pulls
+        alt dryrun == false
+            action ->> github : isssues.createComment (body)
+            github ->> dev : Notify merge conflict pulls <br> via issue comments subscription <br> (e.g. Slack /github subscribe)
+        end
+    end
+```
 
 - [pulls.list](https://docs.github.com/en/rest/reference/pulls#list-pull-requests)
 - [pulls.get](https://docs.github.com/en/rest/reference/pulls#get-a-pull-request)
