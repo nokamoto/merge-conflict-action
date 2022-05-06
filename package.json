@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/nokamoto/merge-conflict-action#readme",
   "devDependencies": {
-    "@types/jest": "^27.4.1",
+    "@types/jest": "^27.5.0",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
     "@vercel/ncc": "^0.33.4",
