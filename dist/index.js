@@ -247,7 +247,7 @@ function listMergeConflictPulls(repo, unknownStateMaxRetries, sleep) {
                         conflictingPulls.push(p);
                         break;
                     case "unknown":
-                        expbackoff(retries + 1);
+                        yield expbackoff(retries + 1);
                         break;
                 }
             });
