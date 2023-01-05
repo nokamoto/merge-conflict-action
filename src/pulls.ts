@@ -75,7 +75,7 @@ export async function listMergeConflictPulls(
           break;
 
         case "unknown":
-          expbackoff(retries + 1);
+          await expbackoff(retries + 1);
           break;
       }
     };
