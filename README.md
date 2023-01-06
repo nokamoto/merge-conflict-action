@@ -48,11 +48,11 @@ sequenceDiagram
     loop for each pulls
         loop do while mergeable_state == "unknown"
             action ->> action : exponential backoff
+            alt labels does not contain ignore-label
+                action ->> action : drop
+            end
             action ->> github : pulls.get
             github ->> action : pull (mergeable_state, pushed_at)
-        end
-        alt labels does not contain ignore-label
-            action ->> action : drop
         end
         alt mergeable_state != "dirty"
             action ->> action : drop
