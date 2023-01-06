@@ -5,7 +5,7 @@ export interface repo {
 }
 
 export interface label {
-  name?: string
+  name?: string;
 }
 
 export interface pull {

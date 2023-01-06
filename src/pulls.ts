@@ -5,7 +5,7 @@ export async function listPulls({
   token,
   owner,
   repo,
-}: repo): Promise<Omit<pull, "mergeable_state" | "pushed_at" | "labels">[]> {
+}: repo): Promise<Omit<pull, "mergeable_state" | "pushed_at">[]> {
   const octokit = github.getOctokit(token);
 
   return octokit.rest.pulls
@@ -16,7 +16,7 @@ export async function listPulls({
     .then((res) => {
       console.log(pretty(res));
       return res.data.map((p) => {
-        return { number: p.number };
+        return { number: p.number, labels: p.labels };
       });
     });
 }
@@ -59,7 +59,7 @@ export async function listMergeConflictPulls(
   const pulls = await listPulls(repo);
 
   const conflictingPulls: pull[] = [];
-  for (let i = 0; i < pulls.length; i++) {
+  for (const pull of pulls) {
     const expbackoff = async (retries: number) => {
       if (retries > unknownStateMaxRetries) {
         console.log("exceed max trial");
@@ -69,14 +69,16 @@ export async function listMergeConflictPulls(
         await sleep(retries);
       }
 
-      const p = await getPull(repo, pulls[i].number);
-      console.log(JSON.stringify(p));
-
-      if (options?.ignoreLabel && p.labels.some((label) => label.name === options.ignoreLabel)) {
+      if (
+        options?.ignoreLabel &&
+        pull.labels.some((label) => label.name === options.ignoreLabel)
+      ) {
         console.log(`ignore ${options.ignoreLabel} label pull request`);
         return;
       }
 
+      const p = await getPull(repo, pull.number);
+      console.log(JSON.stringify(p));
       switch (p.mergeable_state) {
         case "dirty":
           conflictingPulls.push(p);

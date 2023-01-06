@@ -7,7 +7,7 @@ describe("run", () => {
   const dryrun = false;
 
   const unknownStateMaxRetries = 0;
-  const ignoreLabel = 'ignore-merge-conflict';
+  const ignoreLabel = "ignore-merge-conflict";
 
   const setup = (list: jest.Mock, filter: jest.Mock, create: jest.Mock) => {
     const setFailed = jest.fn();

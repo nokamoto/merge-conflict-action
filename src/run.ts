@@ -24,7 +24,7 @@ export async function run(): Promise<void> {
       ", unknown-state-max-retries =",
       unknownStateMaxRetries,
       ", ignore-label =",
-      ignoreLabel,
+      ignoreLabel
     );
 
     const pulls = await listMergeConflictPulls(
