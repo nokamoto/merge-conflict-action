@@ -61,10 +61,10 @@ describe("listMergeConflictPulls", () => {
     expect(actual).toEqual([]);
   });
 
-  test("list merge conflict pulls if mergeable_state is dirty", async () => {
+  test("list merge conflict pulls if mergeable_state is dirty and labels does not contain ignore-label", async () => {
     const list = jest.fn().mockImplementation(() =>
       Promise.resolve({
-        data: [{ number: 1 }, { number: 2 }],
+        data: [{ number: 1 }, { number: 2 }, { number: 3 }],
       })
     );
 
@@ -75,15 +75,26 @@ describe("listMergeConflictPulls", () => {
           data: {
             number: 1,
             mergeable_state: "dirty",
+            labels: [],
             head: { repo: { pushed_at: "2011-01-26T19:06:43Z" } },
           },
         })
       )
       .mockImplementationOnce(() =>
         Promise.resolve({
-          data: { number: 2, mergeable_state: "clean", head: {} },
+          data: { number: 2, mergeable_state: "clean", labels: [],head: {} },
         })
-      );
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          data: {
+            number: 3,
+            mergeable_state: "dirty",
+            labels: [{ name: "ignore-merge-conflict" }],
+            head: { repo: { pushed_at: "2011-01-26T19:06:43Z" } },
+          }
+        })
+      )
 
     const [getOctokit, sleep] = setup(list, get);
 
@@ -94,10 +105,11 @@ describe("listMergeConflictPulls", () => {
         token: "token",
       },
       0,
-      sleep
+      sleep,
+      { ignoreLabel: "ignore-merge-conflict" }
     );
 
-    expect(getOctokit).toHaveBeenCalledTimes(3);
+    expect(getOctokit).toHaveBeenCalledTimes(4);
     expect(getOctokit).toHaveBeenCalledWith("token");
 
     expect(sleep).toHaveBeenCalledTimes(0);
@@ -108,7 +120,7 @@ describe("listMergeConflictPulls", () => {
       owner: "owner",
     });
 
-    expect(get).toHaveBeenCalledTimes(2);
+    expect(get).toHaveBeenCalledTimes(3);
     expect(get).toHaveBeenNthCalledWith(1, {
       repo: "repo",
       owner: "owner",
@@ -124,6 +136,7 @@ describe("listMergeConflictPulls", () => {
       {
         number: 1,
         mergeable_state: "dirty",
+        labels: [],
         pushed_at: "2011-01-26T19:06:43Z",
       },
     ]);

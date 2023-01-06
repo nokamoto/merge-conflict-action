@@ -12,6 +12,7 @@ export async function run(): Promise<void> {
     const body = core.getInput("body");
     const dryrun = core.getBooleanInput("dryrun");
     const unknownStateMaxRetries = core.getInput("unknown-state-max-retries");
+    const ignoreLabel = core.getInput("ignore-label");
 
     console.log(
       "repo =",
@@ -21,13 +22,16 @@ export async function run(): Promise<void> {
       ", dryrun =",
       dryrun,
       ", unknown-state-max-retries =",
-      unknownStateMaxRetries
+      unknownStateMaxRetries,
+      ", ignore-label =",
+      ignoreLabel,
     );
 
     const pulls = await listMergeConflictPulls(
       repo,
       parseInt(unknownStateMaxRetries, 10),
-      exponentialBackoff
+      exponentialBackoff,
+      { ignoreLabel }
     );
 
     console.log("pulls =", pulls);

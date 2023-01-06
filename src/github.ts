@@ -4,9 +4,14 @@ export interface repo {
   repo: string;
 }
 
+export interface label {
+  name?: string
+}
+
 export interface pull {
   number: number;
   mergeable_state: string;
+  labels: label[];
   pushed_at?: string;
 }
 
