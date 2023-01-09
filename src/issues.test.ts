@@ -29,7 +29,7 @@ describe("createIssueComments", () => {
 
     await createIssueComments(
       { repo: "repo", owner: "owner", token: "token" },
-      [{ number: 1, mergeable_state: "dirty" }],
+      [{ number: 1, mergeable_state: "dirty", labels: [] }],
       "body",
       false
     );
@@ -56,7 +56,7 @@ describe("createIssueComments", () => {
     await expect(
       createIssueComments(
         { repo: "repo", owner: "owner", token: "token" },
-        [{ number: 1, mergeable_state: "dirty" }],
+        [{ number: 1, mergeable_state: "dirty", labels: [] }],
         "body",
         false
       )
@@ -73,7 +73,7 @@ describe("createIssueComments", () => {
 
     await createIssueComments(
       { repo: "repo", owner: "owner", token: "token" },
-      [{ number: 1, mergeable_state: "dirty" }],
+      [{ number: 1, mergeable_state: "dirty", labels: [] }],
       "body",
       true
     );
@@ -125,6 +125,7 @@ describe("filterPulls", () => {
         {
           number: 1,
           mergeable_state: "dirty",
+          labels: [],
           pushed_at: "2011-01-26T19:06:43Z",
         },
       ],
@@ -135,6 +136,7 @@ describe("filterPulls", () => {
       {
         number: 1,
         mergeable_state: "dirty",
+        labels: [],
         pushed_at: "2011-01-26T19:06:43Z",
       },
     ]);
@@ -165,6 +167,7 @@ describe("filterPulls", () => {
         {
           number: 1,
           mergeable_state: "dirty",
+          labels: [],
           pushed_at: "2011-01-26T19:06:43Z",
         },
       ],
@@ -192,6 +195,7 @@ describe("filterPulls", () => {
         {
           number: 1,
           mergeable_state: "dirty",
+          labels: [],
           pushed_at: "2011-01-26T19:06:43Z",
         },
       ],
@@ -202,6 +206,7 @@ describe("filterPulls", () => {
       {
         number: 1,
         mergeable_state: "dirty",
+        labels: [],
         pushed_at: "2011-01-26T19:06:43Z",
       },
     ]);
@@ -225,6 +230,7 @@ describe("filterPulls", () => {
         {
           number: 1,
           mergeable_state: "dirty",
+          labels: [],
           pushed_at: "2011-01-26T19:06:43Z",
         },
       ],
@@ -235,6 +241,7 @@ describe("filterPulls", () => {
       {
         number: 1,
         mergeable_state: "dirty",
+        labels: [],
         pushed_at: "2011-01-26T19:06:43Z",
       },
     ]);

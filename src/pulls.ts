@@ -16,7 +16,7 @@ export async function listPulls({
     .then((res) => {
       console.log(pretty(res));
       return res.data.map((p) => {
-        return { number: p.number };
+        return { number: p.number, labels: p.labels };
       });
     });
 }
@@ -38,6 +38,7 @@ async function getPull(
       return {
         number: res.data.number,
         mergeable_state: res.data.mergeable_state,
+        labels: res.data.labels,
         pushed_at: res.data.head.repo?.pushed_at,
       };
     });
@@ -52,12 +53,13 @@ export async function exponentialBackoff(retries: number): Promise<void> {
 export async function listMergeConflictPulls(
   repo: repo,
   unknownStateMaxRetries: number,
-  sleep: (retries: number) => Promise<void>
+  sleep: (retries: number) => Promise<void>,
+  options?: { ignoreLabel?: string }
 ): Promise<pull[]> {
   const pulls = await listPulls(repo);
 
   const conflictingPulls: pull[] = [];
-  for (let i = 0; i < pulls.length; i++) {
+  for (const pull of pulls) {
     const expbackoff = async (retries: number) => {
       if (retries > unknownStateMaxRetries) {
         console.log("exceed max trial");
@@ -67,7 +69,15 @@ export async function listMergeConflictPulls(
         await sleep(retries);
       }
 
-      const p = await getPull(repo, pulls[i].number);
+      if (
+        options?.ignoreLabel &&
+        pull.labels.some((label) => label.name === options.ignoreLabel)
+      ) {
+        console.log(`ignore ${options.ignoreLabel} label pull request`);
+        return;
+      }
+
+      const p = await getPull(repo, pull.number);
       console.log(JSON.stringify(p));
       switch (p.mergeable_state) {
         case "dirty":

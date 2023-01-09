@@ -29,6 +29,7 @@ jobs:
 | token | A string token to authenticate to Github. | true | |
 | body | A string body to create issue comments. | false | `"Merge Conflict found"` |
 | dryrun | A boolean to indicate whether the action creates actual issue comments. | false | `"false"` |
+| ignore-label | A string label name to filter pulls containing the specified label. | false | |
 
 ## How does it works?
 ```mermaid
@@ -47,6 +48,9 @@ sequenceDiagram
     loop for each pulls
         loop do while mergeable_state == "unknown"
             action ->> action : exponential backoff
+            alt labels does not contain ignore-label
+                action ->> action : drop
+            end
             action ->> github : pulls.get
             github ->> action : pull (mergeable_state, pushed_at)
         end

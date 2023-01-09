@@ -7,6 +7,7 @@ describe("run", () => {
   const dryrun = false;
 
   const unknownStateMaxRetries = 0;
+  const ignoreLabel = "ignore-merge-conflict";
 
   const setup = (list: jest.Mock, filter: jest.Mock, create: jest.Mock) => {
     const setFailed = jest.fn();
@@ -14,6 +15,9 @@ describe("run", () => {
     jest.spyOn(core, "getInput").mockImplementation((name) => {
       if (name == "unknown-state-max-retries") {
         return unknownStateMaxRetries.toString();
+      }
+      if (name == "ignore-label") {
+        return ignoreLabel;
       }
       return name;
     });
@@ -54,7 +58,8 @@ describe("run", () => {
         token: "token",
       },
       unknownStateMaxRetries,
-      expect.anything()
+      expect.anything(),
+      { ignoreLabel }
     );
 
     expect(filter).toHaveBeenCalledTimes(1);

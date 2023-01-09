@@ -61,10 +61,14 @@ describe("listMergeConflictPulls", () => {
     expect(actual).toEqual([]);
   });
 
-  test("list merge conflict pulls if mergeable_state is dirty", async () => {
+  test("list merge conflict pulls if mergeable_state is dirty and labels does not contain ignore-label", async () => {
     const list = jest.fn().mockImplementation(() =>
       Promise.resolve({
-        data: [{ number: 1 }, { number: 2 }],
+        data: [
+          { number: 1, labels: [] },
+          { number: 2, labels: [] },
+          { number: 3, labels: [{ name: "ignore-merge-conflict" }] },
+        ],
       })
     );
 
@@ -75,13 +79,24 @@ describe("listMergeConflictPulls", () => {
           data: {
             number: 1,
             mergeable_state: "dirty",
+            labels: [],
             head: { repo: { pushed_at: "2011-01-26T19:06:43Z" } },
           },
         })
       )
       .mockImplementationOnce(() =>
         Promise.resolve({
-          data: { number: 2, mergeable_state: "clean", head: {} },
+          data: { number: 2, mergeable_state: "clean", labels: [], head: {} },
+        })
+      )
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          data: {
+            number: 3,
+            mergeable_state: "dirty",
+            labels: [{ name: "ignore-merge-conflict" }],
+            head: { repo: { pushed_at: "2011-01-26T19:06:43Z" } },
+          },
         })
       );
 
@@ -94,7 +109,8 @@ describe("listMergeConflictPulls", () => {
         token: "token",
       },
       0,
-      sleep
+      sleep,
+      { ignoreLabel: "ignore-merge-conflict" }
     );
 
     expect(getOctokit).toHaveBeenCalledTimes(3);
@@ -124,6 +140,7 @@ describe("listMergeConflictPulls", () => {
       {
         number: 1,
         mergeable_state: "dirty",
+        labels: [],
         pushed_at: "2011-01-26T19:06:43Z",
       },
     ]);

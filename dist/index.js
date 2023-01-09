@@ -195,7 +195,7 @@ function listPulls({ token, owner, repo, }) {
             .then((res) => {
             console.log((0, github_1.pretty)(res));
             return res.data.map((p) => {
-                return { number: p.number };
+                return { number: p.number, labels: p.labels };
             });
         });
     });
@@ -216,6 +216,7 @@ function getPull({ token, owner, repo }, number) {
             return {
                 number: res.data.number,
                 mergeable_state: res.data.mergeable_state,
+                labels: res.data.labels,
                 pushed_at: (_a = res.data.head.repo) === null || _a === void 0 ? void 0 : _a.pushed_at,
             };
         });
@@ -227,11 +228,11 @@ function exponentialBackoff(retries) {
     });
 }
 exports.exponentialBackoff = exponentialBackoff;
-function listMergeConflictPulls(repo, unknownStateMaxRetries, sleep) {
+function listMergeConflictPulls(repo, unknownStateMaxRetries, sleep, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const pulls = yield listPulls(repo);
         const conflictingPulls = [];
-        for (let i = 0; i < pulls.length; i++) {
+        for (const pull of pulls) {
             const expbackoff = (retries) => __awaiter(this, void 0, void 0, function* () {
                 if (retries > unknownStateMaxRetries) {
                     console.log("exceed max trial");
@@ -240,7 +241,12 @@ function listMergeConflictPulls(repo, unknownStateMaxRetries, sleep) {
                 if (retries != 0) {
                     yield sleep(retries);
                 }
-                const p = yield getPull(repo, pulls[i].number);
+                if ((options === null || options === void 0 ? void 0 : options.ignoreLabel) &&
+                    pull.labels.some((label) => label.name === options.ignoreLabel)) {
+                    console.log(`ignore ${options.ignoreLabel} label pull request`);
+                    return;
+                }
+                const p = yield getPull(repo, pull.number);
                 console.log(JSON.stringify(p));
                 switch (p.mergeable_state) {
                     case "dirty":
@@ -314,8 +320,9 @@ function run() {
             const body = core.getInput("body");
             const dryrun = core.getBooleanInput("dryrun");
             const unknownStateMaxRetries = core.getInput("unknown-state-max-retries");
-            console.log("repo =", JSON.stringify(repo), ", body =", body, ", dryrun =", dryrun, ", unknown-state-max-retries =", unknownStateMaxRetries);
-            const pulls = yield (0, pulls_1.listMergeConflictPulls)(repo, parseInt(unknownStateMaxRetries, 10), pulls_1.exponentialBackoff);
+            const ignoreLabel = core.getInput("ignore-label");
+            console.log("repo =", JSON.stringify(repo), ", body =", body, ", dryrun =", dryrun, ", unknown-state-max-retries =", unknownStateMaxRetries, ", ignore-label =", ignoreLabel);
+            const pulls = yield (0, pulls_1.listMergeConflictPulls)(repo, parseInt(unknownStateMaxRetries, 10), pulls_1.exponentialBackoff, { ignoreLabel });
             console.log("pulls =", pulls);
             const filtered = yield (0, issues_1.filterPulls)(repo, pulls, body);
             yield (0, issues_1.createIssueComments)(repo, filtered, body, dryrun);

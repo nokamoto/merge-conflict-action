@@ -25,6 +25,9 @@ inputs:
     description: A number of maximum retries to get a pull state. The `pulls.get` request retries when the response state is `unknown`.
     required: false
     default: "5"
+  ignore-label:
+    description: A string label name to filter pulls containing the specified label.
+    required: false
 runs:
   using: node12
   main: dist/index.js
