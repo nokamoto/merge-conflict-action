@@ -29,5 +29,5 @@ inputs:
     description: A string label name to filter pulls containing the specified label.
     required: false
 runs:
-  using: node12
+  using: node16
   main: dist/index.js
